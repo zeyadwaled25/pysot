@@ -10,7 +10,8 @@ import numpy as np
 import torch
 
 from pysot.core.config import cfg
-
+import torch
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 class BaseTracker(object):
     """ Base tracker of single objec tracking
@@ -79,10 +80,10 @@ class SiameseTracker(BaseTracker):
             if right_pad:
                 te_im[:, c + left_pad:, :] = avg_chans
             im_patch = te_im[int(context_ymin):int(context_ymax + 1),
-                             int(context_xmin):int(context_xmax + 1), :]
+                            int(context_xmin):int(context_xmax + 1), :]
         else:
             im_patch = im[int(context_ymin):int(context_ymax + 1),
-                          int(context_xmin):int(context_xmax + 1), :]
+                            int(context_xmin):int(context_xmax + 1), :]
 
         if not np.array_equal(model_sz, original_sz):
             im_patch = cv2.resize(im_patch, (model_sz, model_sz))
@@ -91,5 +92,5 @@ class SiameseTracker(BaseTracker):
         im_patch = im_patch.astype(np.float32)
         im_patch = torch.from_numpy(im_patch)
         if cfg.CUDA:
-            im_patch = im_patch.cuda()
+            im_patch = im_patch.to(device)
         return im_patch

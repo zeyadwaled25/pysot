@@ -46,7 +46,7 @@ class SiamRPNTracker(SiameseTracker):
 
     def _convert_bbox(self, delta, anchor):
         delta = delta.permute(1, 2, 3, 0).contiguous().view(4, -1)
-        delta = delta.data.cpu().numpy()
+        delta = delta.data.float().cpu().numpy()
 
         delta[0, :] = delta[0, :] * anchor[:, 2] + anchor[:, 0]
         delta[1, :] = delta[1, :] * anchor[:, 3] + anchor[:, 1]
@@ -56,7 +56,7 @@ class SiamRPNTracker(SiameseTracker):
 
     def _convert_score(self, score):
         score = score.permute(1, 2, 3, 0).contiguous().view(2, -1).permute(1, 0)
-        score = F.softmax(score, dim=1).data[:, 1].cpu().numpy()
+        score = F.softmax(score, dim=1).data[:, 1].float().cpu().numpy()
         return score
 
     def _bbox_clip(self, cx, cy, width, height, boundary):
